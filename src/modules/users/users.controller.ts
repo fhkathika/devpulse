@@ -12,15 +12,26 @@ const result=await userService.craeteUserIntoDB(req.body)
         data:result.rows[0],
     })
 }
-catch(err:any){
+ catch(error:unknown){
+   if(error instanceof Error){
 
 sendResponse(res,{
     statusCode:500,
         success:false,
-       message:err.message,
-        error:err
+       message:error.message,
+        error:error
     })
-}
+    }
+    else{
+
+sendResponse(res,{
+    statusCode:500,
+        success:false,
+       message:"Unknown error",
+        error:error
+    })
+    }
+  } 
 }
 export const userController={
     createUser

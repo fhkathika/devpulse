@@ -24,7 +24,7 @@ await pool.query(`
         describtion TEXT NOT NULL,
         type VARCHAR(30) NOT NULL,
         status VARCHAR(30) DEFAULT 'open',
-        reported_id INTEGER NOT NULL,
+        reporter_id INTEGER NOT NULL,
         created_at TIMESTAMP  DEFAULT NOW(),
         updated_at TIMESTAMP  DEFAULT NOW()
 

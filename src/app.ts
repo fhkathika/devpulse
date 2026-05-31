@@ -1,6 +1,7 @@
 import express, { type Application, type Request, type Response } from "express"
 import { userRoute } from "./modules/users/users.route"
 import { authRouter } from "./modules/auth/auth.route"
+import { issueRoute } from "./modules/issues/issue.route"
 
 
 const app:Application = express()
@@ -20,6 +21,7 @@ res.status(200).json({
 })
 app.use('/api/auth/signup',userRoute)
 app.use('/api/auth',authRouter)
+app.use('/api/issues',issueRoute)
 
 
 export default app
