@@ -3,6 +3,7 @@ import config from "../config";
 import jwt, { type JwtPayload } from "jsonwebtoken"
 import { pool } from "../db";
 import type { ROLES } from "../Types";
+import sendResponse from "../utility/serverResponse";
 
 
 const auth=(...roles:ROLES[])=>{
@@ -12,10 +13,12 @@ console.log(roles)
 // console.log("this is protected route")
 const token=req.headers.authorization;
 if(!token){
-  return res.status(401).json({
-    "success":false,
-    "message":"Unauthrized!!"
-   }) 
+  return sendResponse(res,{
+    statusCode:401,
+        success:false,
+       message:"Unauthrized!!",
+       
+    })
   
 }
  const decoded=jwt.verify(token as string,config.secret as string) as JwtPayload
@@ -25,17 +28,23 @@ const userData=await pool.query(`
    
     const user=userData.rows[0]
   if(userData.rows.length===0){
-return res.status(404).json({
-    success:false,
-    message:"Users not found"
-})
+return sendResponse(res,{
+    statusCode:404,
+        success:false,
+       message:"Users not found",
+       
+    })
   }
  
  if(roles.length && !roles.includes(user.role)){
-   return res.status(403).json({
-    success:false,
-    message:"Forbidden"
-})
+   return sendResponse(res,{
+    statusCode:403,
+        success:false,
+       message:"Forbidden",
+       
+    })
+
+
 
  }
   req.user=decoded;

@@ -38,6 +38,39 @@ sendResponse(res,{
     }
   } 
 }
+
+const getAllIssue=async(req:Request,res:Response)=>{
+try{
+    const result =await issueService.getAllIssueFromDB()
+ sendResponse(res,{
+    statusCode:200,
+        success:true,
+       message:"Issues retrived successfully",
+        data:result,
+    })
+}
+catch(err:unknown){
+if(err instanceof Error){
+
+sendResponse(res,{
+    statusCode:500,
+        success:false,
+       message:err.message,
+        error:err
+    })
+    }
+    else{
+
+sendResponse(res,{
+    statusCode:500,
+        success:false,
+       message:"Unknown error",
+        error:err
+    })
+    }
+}
+}
 export const issueController={
-    createIssue
+    createIssue,
+    getAllIssue
 }
