@@ -23,6 +23,7 @@ if(!matchPassword){
 //generate token
 const jwtPayload={
     id:user.id,
+    email:user.email,
     name:user.name,
     role:user.role
 }
@@ -34,6 +35,7 @@ return {token,
 
     user:{
     id:user.id,
+    email:user.email,
     name:user.name,
     role:user.role,
     created_at:user.created_at,

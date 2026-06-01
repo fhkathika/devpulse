@@ -5,7 +5,7 @@ const createIssueIntoDB=async(payload:Iissue,reporterId:number)=>{
 const {title,description,type}=payload
     const result =await pool.query(`
     INSERT INTO issues(
-    title,describtion,type,reporter_id
+    title,description,type,reporter_id
     ) VALUES($1,$2,$3,$4) RETURNING *
     
     `,[title,description,type,reporterId])

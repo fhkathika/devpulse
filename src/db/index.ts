@@ -21,13 +21,12 @@ await pool.query(`
         CREATE TABLE IF NOT EXISTS issues(
         id SERIAL PRIMARY KEY,
         title VARCHAR(150) NOT NULL,
-        describtion TEXT NOT NULL,
+        description TEXT NOT NULL,
         type VARCHAR(30) NOT NULL,
         status VARCHAR(30) DEFAULT 'open',
         reporter_id INTEGER NOT NULL,
         created_at TIMESTAMP  DEFAULT NOW(),
         updated_at TIMESTAMP  DEFAULT NOW()
-
         )
         `);
         console.log("DB connected Successfully")
