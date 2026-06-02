@@ -70,7 +70,76 @@ sendResponse(res,{
     }
 }
 }
+const getSingleIssue=async(req:Request,res:Response)=>{
+const {id}=req.params;
+try{
+const result=await issueService.getSingleIssueFromDB(id as string)
+if(result.length===0){
+     sendResponse(res,{
+    statusCode:404,
+        success:false,
+       message:"Issues not found",
+        data:{},
+    })
+}
+ sendResponse(res,{
+    statusCode:200,
+        success:true,
+       message:"Issue retrived successfully",
+        data:result,
+    })
+}
+catch(err:unknown){
+if(err instanceof Error){
+
+sendResponse(res,{
+    statusCode:500,
+        success:false,
+       message:err.message,
+        error:err
+    })
+    }
+    else{
+
+sendResponse(res,{
+    statusCode:500,
+        success:false,
+       message:"Unknown error",
+        error:err
+    })
+    }
+}
+}
+
+const updateIssue=async(req:Request,res:Response)=>{
+const {id}=req.params;
+// console.log("Id:",id)
+// console.log({name,password,age,is_active})
+try{
+const result=await issueService.updateUserFromDB(req.body,id as string)
+if(result.rows.length===0){
+    res.status(404).json({
+        success:false,
+        message:"Issue not found"
+    })
+}
+ res.status(200).json({
+        success:true,
+        message:"User,updated successfully",
+        data:result.rows[0]
+    })
+}
+catch(err:any){
+ res.status(500).json({
+        success:false,
+        message:err.message,
+        error:err
+    })
+}
+
+}
 export const issueController={
     createIssue,
-    getAllIssue
+    getAllIssue,
+    getSingleIssue
 }
