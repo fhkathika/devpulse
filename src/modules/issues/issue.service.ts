@@ -72,8 +72,12 @@ updated_at:issue.updated_at,
             }))
             return issuesWithReportrDetail
 }
+const updateIssueFromDB=async()=>{
+
+}
 export const issueService={
     createIssueIntoDB,
     getAllIssueFromDB,
-    getSingleIssueFromDB
+    getSingleIssueFromDB,
+    updateIssueFromDB
 }

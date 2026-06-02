@@ -116,7 +116,7 @@ const {id}=req.params;
 // console.log("Id:",id)
 // console.log({name,password,age,is_active})
 try{
-const result=await issueService.updateUserFromDB(req.body,id as string)
+const result=await issueService.updateIssueFromDB(req.body,id as string)
 if(result.rows.length===0){
     res.status(404).json({
         success:false,
@@ -141,5 +141,6 @@ catch(err:any){
 export const issueController={
     createIssue,
     getAllIssue,
-    getSingleIssue
+    getSingleIssue,
+    updateIssue
 }

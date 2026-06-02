@@ -11,9 +11,9 @@ throw new Error("Invalid role")
 }
 const result =await pool.query(`
     INSERT INTO users(name,email,password,role)
-    VALUES($1,$2,$3,$4)
+    VALUES($1,$2,$3,$4,COALESCE($5,'contributor'))
     RETURNING *
-    `,[name,email,hashPassword,role || "contributor"])
+    `,[name,email,hashPassword,role])
     delete result.rows[0].password;
     return result
 }
