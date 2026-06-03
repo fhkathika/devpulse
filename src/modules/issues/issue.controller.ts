@@ -113,28 +113,44 @@ sendResponse(res,{
 
 const updateIssue=async(req:Request,res:Response)=>{
 const {id}=req.params;
-// console.log("Id:",id)
-// console.log({name,password,age,is_active})
 try{
 const result=await issueService.updateIssueFromDB(req.body,id as string)
 if(result.rows.length===0){
-    res.status(404).json({
+    sendResponse(res,{
+    statusCode:404,
         success:false,
-        message:"Issue not found"
+       message:"Issue not found",
+       
     })
 }
- res.status(200).json({
+
+    sendResponse(res,{
+    statusCode:200,
         success:true,
-        message:"User,updated successfully",
+       message:"Issue updated successfully",
         data:result.rows[0]
     })
 }
-catch(err:any){
- res.status(500).json({
+catch(error:unknown){
+    if(error instanceof Error){
+
+sendResponse(res,{
+    statusCode:500,
         success:false,
-        message:err.message,
-        error:err
+       message:error.message,
+        error:error
     })
+    }
+    else{
+
+sendResponse(res,{
+    statusCode:500,
+        success:false,
+       message:"Unknown error",
+        error:error
+    })
+    }
+
 }
 
 }
@@ -142,5 +158,6 @@ export const issueController={
     createIssue,
     getAllIssue,
     getSingleIssue,
-    updateIssue
+    updateIssue,
+    deleteIssue
 }

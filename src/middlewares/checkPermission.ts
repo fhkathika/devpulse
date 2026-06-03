@@ -5,10 +5,13 @@ import sendResponse from "../utility/serverResponse";
 export const checkPermission=async(req:Request,res:Response,next:NextFunction)=>{
 try{
 const {id}=req.params
+console.log("User",req.user)
+
 const result=await pool.query(`
     SELECT * FROM issues WHERE id=$1
     `,[id])
     const issue=result.rows[0]
+    console.log("Issue",issue)
     if(!issue){
          return sendResponse(res,{
     statusCode:404,

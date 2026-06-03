@@ -12,4 +12,5 @@ router.get('/',issueController.getAllIssue)
 router.get('/:id',issueController.getSingleIssue)
 // update issue 
 router.patch('/:id',auth("contributor","maintainer"),checkPermission,issueController.updateIssue)
+router.delete('/:id',checkPermission,issueController.updateIssue)
 export const issueRoute=router

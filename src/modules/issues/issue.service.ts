@@ -72,8 +72,19 @@ updated_at:issue.updated_at,
             }))
             return issuesWithReportrDetail
 }
-const updateIssueFromDB=async()=>{
+const updateIssueFromDB=async(payload:Iissue,id:string)=>{
+const {title,description,type}=payload
+const result=await pool.query(`
+    UPDATE issues
+    SET
+   
+    title=COALESCE($1,title),
+    description=COALESCE($2,description),
+    type=COALESCE($3,type)
+   WHERE id=$4 RETURNING *
 
+    `,[title,description,type,id])
+    return result
 }
 export const issueService={
     createIssueIntoDB,
