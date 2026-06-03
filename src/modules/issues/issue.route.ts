@@ -2,6 +2,7 @@ import { Router } from "express";
 import { issueController } from "./issue.controller";
 import auth from "../../middlewares/auth";
 import { checkPermission } from "../../middlewares/checkPermission";
+import { checkDeletePermission } from "../../middlewares/checkDeletePermission";
 
 const router=Router();
 // create issue 
@@ -12,5 +13,5 @@ router.get('/',issueController.getAllIssue)
 router.get('/:id',issueController.getSingleIssue)
 // update issue 
 router.patch('/:id',auth("contributor","maintainer"),checkPermission,issueController.updateIssue)
-router.delete('/:id',checkPermission,issueController.updateIssue)
+router.delete('/:id',auth("contributor","maintainer"),checkDeletePermission,issueController.deleteIssue)
 export const issueRoute=router

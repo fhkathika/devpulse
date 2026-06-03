@@ -86,9 +86,15 @@ const result=await pool.query(`
     `,[title,description,type,id])
     return result
 }
+const deleteIssueFromDB=async(id:string)=>{
+const result=await pool.query(`
+    DELETE FROM ISSUES WHERE id=$1`,[id])
+    return result
+}
 export const issueService={
     createIssueIntoDB,
     getAllIssueFromDB,
     getSingleIssueFromDB,
-    updateIssueFromDB
+    updateIssueFromDB,
+    deleteIssueFromDB
 }

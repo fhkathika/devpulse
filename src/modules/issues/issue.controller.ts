@@ -154,6 +154,49 @@ sendResponse(res,{
 }
 
 }
+const deleteIssue=async(req:Request,res:Response)=>{
+const {id}=req.params;
+try{
+const result=await issueService.deleteIssueFromDB(id as string)
+if(result.rowCount===0){
+    sendResponse(res,{
+    statusCode:404,
+        success:false,
+       message:"Issue not found",
+       
+    })
+}
+
+    sendResponse(res,{
+    statusCode:200,
+        success:true,
+       message:"Issue deleted successfully",
+        data:{}
+    })
+}
+catch(error:unknown){
+    if(error instanceof Error){
+
+sendResponse(res,{
+    statusCode:500,
+        success:false,
+       message:error.message,
+        error:error
+    })
+    }
+    else{
+
+sendResponse(res,{
+    statusCode:500,
+        success:false,
+       message:"Unknown error",
+        error:error
+    })
+    }
+
+}
+
+}
 export const issueController={
     createIssue,
     getAllIssue,
