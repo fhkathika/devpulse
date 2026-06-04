@@ -1,7 +1,8 @@
 export interface Iissue{
     title:string,
     description:string,
-    type:string
+    type:string,
+    status?:string
     
     // age:number,
     // is_active?:boolean,

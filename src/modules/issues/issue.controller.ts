@@ -43,10 +43,7 @@ const getAllIssue=async(req:Request,res:Response)=>{
     const {sort,type,status}=req.query
 try{
     const result =await issueService.getAllIssueFromDB(
-        {sort:sort as string ,
-          type:  type as string,
-          status:sttaus as string
-        }
+        {sort,type,status}
     )
  sendResponse(res,{
     statusCode:200,

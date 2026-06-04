@@ -1,5 +1,6 @@
 import { pool } from "../../db"
 import type { Iissue } from "./issue.interface"
+import type { ITypes } from "./issues.types"
 
 const createIssueIntoDB=async(payload:Iissue,reporterId:number)=>{
 const {title,description,type}=payload
@@ -11,8 +12,8 @@ const {title,description,type}=payload
     `,[title,description,type,reporterId])
     return result
 }
-const getAllIssueFromDB=async({sort,type,status})=>{
-
+const getAllIssueFromDB=async(payload:ITypes)=>{
+const {sort,type,status}=payload
     const conditions=[];
          const value=[];
              if(type){
@@ -26,19 +27,19 @@ const getAllIssueFromDB=async({sort,type,status})=>{
 
 let query=`SELECT * FROM issues` ;
  
-         query+="WHERE ..."
-const result=await pool.query(query,value)
+
         
 if(conditions.length>0){
-    query +=`WHERE ${conditions.join(" AND")}`
+    query +=` WHERE ${conditions.join(" AND ")}`
 }
 
 if(sort ==="oldest"){
     query += ` ORDER BY created_at ASC`
 }
 else{
-    query +=`ORDER BY created_at DESC`
+    query +=` ORDER BY created_at DESC`
 }
+const result=await pool.query(query,value)
         const  reporterId=[
             ...new Set(result.rows.map(issue=>issue.reporter_id))
         ]
@@ -97,17 +98,20 @@ updated_at:issue.updated_at,
             return issuesWithReportrDetail
 }
 const updateIssueFromDB=async(payload:Iissue,id:string)=>{
-const {title,description,type}=payload
+const {title,description,type,status}=payload
 const result=await pool.query(`
     UPDATE issues
     SET
    
     title=COALESCE($1,title),
     description=COALESCE($2,description),
-    type=COALESCE($3,type)
-   WHERE id=$4 RETURNING *
+    type=COALESCE($3,type),
+    status=COALESCE($4,status)
+   WHERE id=$5 RETURNING *
 
-    `,[title,description,type,id])
+    `,[title,description,type,status,id])
+    console.log("payload",payload)
+    console.log("status",status)
     return result
 }
 const deleteIssueFromDB=async(id:string)=>{
