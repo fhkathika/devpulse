@@ -40,8 +40,14 @@ sendResponse(res,{
 }
 
 const getAllIssue=async(req:Request,res:Response)=>{
+    const {sort,type,status}=req.query
 try{
-    const result =await issueService.getAllIssueFromDB()
+    const result =await issueService.getAllIssueFromDB(
+        {sort:sort as string ,
+          type:  type as string,
+          status:sttaus as string
+        }
+    )
  sendResponse(res,{
     statusCode:200,
         success:true,

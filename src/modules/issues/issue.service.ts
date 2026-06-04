@@ -11,15 +11,39 @@ const {title,description,type}=payload
     `,[title,description,type,reporterId])
     return result
 }
-const getAllIssueFromDB=async()=>{
+const getAllIssueFromDB=async({sort,type,status})=>{
 
-    const result=await pool.query(`
+    const conditions=[];
+         const value=[];
+             if(type){
+  value.push(type)  
+  conditions.push(`type=$${value.length}`)
+}
+       if(status){
+  value.push(status)  
+  conditions.push(`status=$${value.length}`)
+}
+
+let query=`SELECT * FROM issues` ;
+ 
+         query+="WHERE ..."
+const result=await pool.query(query,value)
         
-        SELECT * FROM issues
-         `)
+if(conditions.length>0){
+    query +=`WHERE ${conditions.join(" AND")}`
+}
+
+if(sort ==="oldest"){
+    query += ` ORDER BY created_at ASC`
+}
+else{
+    query +=`ORDER BY created_at DESC`
+}
         const  reporterId=[
             ...new Set(result.rows.map(issue=>issue.reporter_id))
         ]
+   
+  
         const userResult=await pool.query(`
            SELECT id,name,role
            FROM users
