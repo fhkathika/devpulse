@@ -572,7 +572,7 @@ var checkPermission = async (req, res, next) => {
     if (req.user.role === "maintainer") {
       return next();
     }
-    if (req.user.role === "contributor" && req.body.status !== void 0) {
+    if (req.user.role === "contributor" && issue.status != "open" && issue.reporter_id != req.user.id) {
       return serverResponse_default(res, {
         statusCode: 403,
         success: false,

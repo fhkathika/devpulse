@@ -26,7 +26,8 @@ const result=await pool.query(`
      return next()   
     }
     if(req.user.role==="contributor" &&
-      req.body.status!==undefined
+      issue.status!="open"&&
+      issue.reporter_id!=req.user.id  
     ){
         return  sendResponse(res,{
     statusCode:403,
