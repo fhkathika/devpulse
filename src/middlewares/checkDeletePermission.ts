@@ -5,7 +5,6 @@ import sendResponse from "../utility/serverResponse";
 export const checkDeletePermission=async(req:Request,res:Response,next:NextFunction)=>{
 try{
 const {id}=req.params
-console.log("User",req.user)
 
 const result=await pool.query(`
     SELECT * FROM issues WHERE id=$1

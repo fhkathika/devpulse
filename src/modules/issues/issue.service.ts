@@ -13,7 +13,7 @@ const {title,description,type}=payload
     return result
 }
 const getAllIssueFromDB=async(payload:ITypes)=>{
-const {sort,type,status}=payload
+const {sort="newest",type,status}=payload
     const conditions=[];
          const value=[];
              if(type){
@@ -106,13 +106,15 @@ const result=await pool.query(`
     title=COALESCE($1,title),
     description=COALESCE($2,description),
     type=COALESCE($3,type),
-    status=COALESCE($4,status)
+    status=COALESCE($4,status),
+    updated_at=CURRENT_TIMESTAMP
    WHERE id=$5 RETURNING *
 
     `,[title,description,type,status,id])
     console.log("payload",payload)
     console.log("status",status)
-    return result
+    console.log("result.rows[0]",result.rows[0])
+    return result.rows[0]
 }
 const deleteIssueFromDB=async(id:string)=>{
 const result=await pool.query(`

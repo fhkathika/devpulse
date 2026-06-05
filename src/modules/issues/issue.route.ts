@@ -8,7 +8,7 @@ const router=Router();
 // create issue 
 router.post('/',auth("contributor","maintainer"),issueController.createIssue)
 // get all issue 
-router.get('?sort=newest',issueController.getAllIssue)
+router.get('/',issueController.getAllIssue)
 // get single issue
 router.get('/:id',issueController.getSingleIssue)
 // update issue 

@@ -8,9 +8,9 @@ import sendResponse from "../utility/serverResponse";
 
 const auth=(...roles:ROLES[])=>{
     return async (req:Request,res:Response,next:NextFunction)=>{
-console.log(roles)
+
       try{
-// console.log("this is protected route")
+console.log("this is protected route")
 const token=req.headers.authorization;
 if(!token){
   return sendResponse(res,{
@@ -22,7 +22,7 @@ if(!token){
   
 }
  const decoded=jwt.verify(token as string,config.secret as string) as JwtPayload
-console.log("decode",decoded)
+
 const userData=await pool.query(`
     SELECT * FROM users WHERE email=$1`,[decoded.email])
    

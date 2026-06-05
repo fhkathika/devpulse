@@ -1,6 +1,7 @@
 import type { Request, Response } from "express"
 import sendResponse from "../../utility/serverResponse"
 import { issueService } from "./issue.service"
+import type { ITypes } from "./issues.types"
 
 const createIssue=async(req:Request,res:Response)=>{
   try{
@@ -40,11 +41,9 @@ sendResponse(res,{
 }
 
 const getAllIssue=async(req:Request,res:Response)=>{
-    const {sort,type,status}=req.query
+    const {sort,type,status}=req.query as ITypes
 try{
-    const result =await issueService.getAllIssueFromDB(
-        {sort,type,status}
-    )
+    const result =await issueService.getAllIssueFromDB({sort,type,status})
  sendResponse(res,{
     statusCode:200,
         success:true,
@@ -118,7 +117,7 @@ const updateIssue=async(req:Request,res:Response)=>{
 const {id}=req.params;
 try{
 const result=await issueService.updateIssueFromDB(req.body,id as string)
-if(result.rows.length===0){
+if(result.rows===0){
     sendResponse(res,{
     statusCode:404,
         success:false,
@@ -131,7 +130,7 @@ if(result.rows.length===0){
     statusCode:200,
         success:true,
        message:"Issue updated successfully",
-        data:result.rows[0]
+        data:result
     })
 }
 catch(error:unknown){
