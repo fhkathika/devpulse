@@ -74,7 +74,7 @@ var craeteUserIntoDB = async (payload) => {
   }
   const result = await pool.query(`
     INSERT INTO users(name,email,password,role)
-    VALUES($1,$2,$3,$4,COALESCE($5,'contributor'))
+    VALUES($1,$2,$3,COALESCE($4,'contributor'))
     RETURNING *
     `, [name, email, hashPassword, role]);
   delete result.rows[0].password;
@@ -230,11 +230,28 @@ var createIssueIntoDB = async (payload, reporterId) => {
     `, [title, description, type, reporterId]);
   return result;
 };
-var getAllIssueFromDB = async () => {
-  const result = await pool.query(`
-        
-        SELECT * FROM issues
-         `);
+var getAllIssueFromDB = async (payload) => {
+  const { sort = "newest", type, status } = payload;
+  const conditions = [];
+  const value = [];
+  if (type) {
+    value.push(type);
+    conditions.push(`type=$${value.length}`);
+  }
+  if (status) {
+    value.push(status);
+    conditions.push(`status=$${value.length}`);
+  }
+  let query = `SELECT * FROM issues`;
+  if (conditions.length > 0) {
+    query += ` WHERE ${conditions.join(" AND ")}`;
+  }
+  if (sort === "oldest") {
+    query += ` ORDER BY created_at ASC`;
+  } else {
+    query += ` ORDER BY created_at DESC`;
+  }
+  const result = await pool.query(query, value);
   const reporterId = [
     ...new Set(result.rows.map((issue) => issue.reporter_id))
   ];
@@ -288,18 +305,23 @@ var getSingleIssueFromDB = async (id) => {
   return issuesWithReportrDetail;
 };
 var updateIssueFromDB = async (payload, id) => {
-  const { title, description, type } = payload;
+  const { title, description, type, status } = payload;
   const result = await pool.query(`
     UPDATE issues
     SET
    
     title=COALESCE($1,title),
     description=COALESCE($2,description),
-    type=COALESCE($3,type)
-   WHERE id=$4 RETURNING *
+    type=COALESCE($3,type),
+    status=COALESCE($4,status),
+    updated_at=CURRENT_TIMESTAMP
+   WHERE id=$5 RETURNING *
 
-    `, [title, description, type, id]);
-  return result;
+    `, [title, description, type, status, id]);
+  console.log("payload", payload);
+  console.log("status", status);
+  console.log("result.rows[0]", result.rows[0]);
+  return result.rows[0];
 };
 var deleteIssueFromDB = async (id) => {
   const result = await pool.query(`
@@ -347,8 +369,9 @@ var createIssue = async (req, res) => {
   }
 };
 var getAllIssue = async (req, res) => {
+  const { sort, type, status } = req.query;
   try {
-    const result = await issueService.getAllIssueFromDB();
+    const result = await issueService.getAllIssueFromDB(req.query);
     serverResponse_default(res, {
       statusCode: 200,
       success: true,
@@ -413,7 +436,7 @@ var updateIssue = async (req, res) => {
   const { id } = req.params;
   try {
     const result = await issueService.updateIssueFromDB(req.body, id);
-    if (result.rows.length === 0) {
+    if (result.rows === 0) {
       serverResponse_default(res, {
         statusCode: 404,
         success: false,
@@ -424,7 +447,7 @@ var updateIssue = async (req, res) => {
       statusCode: 200,
       success: true,
       message: "Issue updated successfully",
-      data: result.rows[0]
+      data: result
     });
   } catch (error) {
     if (error instanceof Error) {
@@ -491,8 +514,8 @@ var issueController = {
 import jwt2 from "jsonwebtoken";
 var auth = (...roles) => {
   return async (req, res, next) => {
-    console.log(roles);
     try {
+      console.log("this is protected route");
       const token = req.headers.authorization;
       if (!token) {
         return serverResponse_default(res, {
@@ -502,7 +525,6 @@ var auth = (...roles) => {
         });
       }
       const decoded = jwt2.verify(token, config_default.secret);
-      console.log("decode", decoded);
       const userData = await pool.query(`
     SELECT * FROM users WHERE email=$1`, [decoded.email]);
       const user = userData.rows[0];
@@ -533,12 +555,10 @@ var auth_default = auth;
 var checkPermission = async (req, res, next) => {
   try {
     const { id } = req.params;
-    console.log("User", req.user);
     const result = await pool.query(`
     SELECT * FROM issues WHERE id=$1
     `, [id]);
     const issue = result.rows[0];
-    console.log("Issue", issue);
     if (!issue) {
       return serverResponse_default(res, {
         statusCode: 404,
@@ -551,6 +571,13 @@ var checkPermission = async (req, res, next) => {
     }
     if (req.user.role === "maintainer") {
       return next();
+    }
+    if (req.user.role === "contributor" && req.body.status !== void 0) {
+      return serverResponse_default(res, {
+        statusCode: 403,
+        success: false,
+        message: "Contributor can not update status"
+      });
     }
     if (req.user.role === "contributor" && issue.status === "open" && issue.reporter_id === req.user.id) {
       return next();
@@ -569,7 +596,6 @@ var checkPermission = async (req, res, next) => {
 var checkDeletePermission = async (req, res, next) => {
   try {
     const { id } = req.params;
-    console.log("User", req.user);
     const result = await pool.query(`
     SELECT * FROM issues WHERE id=$1
     `, [id]);
