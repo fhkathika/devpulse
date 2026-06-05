@@ -43,7 +43,7 @@ sendResponse(res,{
 const getAllIssue=async(req:Request,res:Response)=>{
     const {sort,type,status}=req.query as ITypes
 try{
-    const result =await issueService.getAllIssueFromDB({sort,type,status})
+    const result =await issueService.getAllIssueFromDB(req.query as ITypes)
  sendResponse(res,{
     statusCode:200,
         success:true,
